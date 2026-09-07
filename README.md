@@ -1,38 +1,56 @@
-# 09-labs-snippet
+# 09 Labs - Component Library & Code Snippet Vault
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A high-performance, responsive code snippet manager and component design system built with Next.js, Tailwind CSS, and robust browser-level state persistence.
+
+## What I Built
+
+**09 Labs** is a modular component library and design system created to streamline front-end development across future projects. The core philosophy is simple:
+
+> **Design -> Build -> Reuse**
+
+Instead of recreating navigation bars, modals, cards, and form controls from scratch for every new application, 09 Labs centralizes these components into a unified, clean, and interactive system.
+
+## Design Direction
+
+The project achieves a balance between clean minimalism and rich personality through:
+
+- **Minimal Structure**: Uncluttered layouts with responsive single-click drawers and intuitive grid/list view modes.
+- **Strong Typography**: Optimized text hierarchy paired with code block formatting.
+- **Creative Details**: Custom color themes (Light, Coffee, and Dark) featuring WCAG AA-compliant contrast ratios.
+- **Purposeful Motion**: Smooth slide-over navigation drawers, command palettes (`Cmd+K`), and interactive modal states.
+
+## Why I Built It
+
+As front-end requirements evolve, maintaining consistency across multiple applications becomes challenging. 09 Labs bridges design and engineering by standardizing:
+
+- Color and theme design tokens
+- Typography scales and responsive padding
+- Reusable React components and modular layouts
+- Full client-side CRUD capabilities (Create, Read, Update, Delete) via robust `localStorage` data structures
+
+## Core Features
+
+- **Advanced Navigation & Search**: Sidebar categorization across General, Languages & Web, Mobile & Systems, and Knowledge & Tools, paired with a global Command Palette (`Cmd+K`).
+- **Complete Snippet Management**: Create, view, edit, and delete custom snippets with real-time error handling and state persistence.
+- **Interactive Sandbox & Favorites**: Test patterns on the fly and bookmark essential snippets for instant access.
+- **Multi-Theme Support**: Seamless switching between Light, Coffee, and Dark modes with persistent user preferences.
 
 ## Getting Started
 
-First, run the development server:
+Clone the repository and install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000/) in your browser to explore the vault.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Status
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Pre-Launch / Portfolio Polish** (Active Phase)
