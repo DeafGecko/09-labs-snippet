@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+  }
+
+  /* =========================================================
+     LIGHT MODE
+     WCAG AA
+     ========================================================= */
+  [data-theme='light'] {
+    --bg-main: #F1F2F3;
+    --bg-surface: #FAFAF9;
+
+    --bg-active: #E3E5E7;
+    --bg-hover: #E8E9EA;
+
+    --text-primary: #252525;
+
+    /* Changed from #707070 for safer AA contrast */
+    --text-muted: #666666;
+
+    --border: #D5D7D9;
+
+    /*
+      Darker blue:
+      - works as normal-size accent text on light cards
+      - works with white button text
+    */
+    --accent: #0369A1;
+    --accent-contrast: #FFFFFF;
+  }
+
+  /* =========================================================
+     COFFEE MODE
+     WCAG AA
+     ========================================================= */
+  [data-theme='coffee'] {
+    --bg-main: #1C1412;
+    --bg-surface: #2C221E;
+
+    --bg-active: #3A2C27;
+    --bg-hover: #42332D;
+
+    --text-primary: #F3F4F6;
+    --text-muted: #B8B1AD;
+
+    --border: #59483F;
+
+    /*
+      Use a lighter amber for text/icons on dark surfaces.
+    */
+    --accent: #F3A94A;
+
+    /*
+      Dark text is safer on this lighter amber button.
+    */
+    --accent-contrast: #21140B;
+  }
+
+  /* =========================================================
+     DARK MODE
+     WCAG AA
+     ========================================================= */
+  [data-theme='dark'] {
+    --bg-main: #090A0F;
+    --bg-surface: #12141C;
+
+    --bg-active: #1A1D27;
+    --bg-hover: #20232E;
+
+    --text-primary: #F8FAFC;
+    --text-muted: #A7B3C4;
+
+    --border: #343A49;
+
+    /*
+      Lighter indigo for readable text/icons on dark surfaces.
+    */
+    --accent: #A5B4FC;
+
+    /*
+      Dark text on the light-indigo action button.
+    */
+    --accent-contrast: #12141C;
+  }
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
