@@ -207,9 +207,8 @@ export default function Header({
         <ProfileMenu
           currentTheme={currentTheme}
           onThemeChange={onThemeChange}
-          onOpenPreferences={() =>
-            alert('Preferences Modal Open')
-          }
+          viewMode={viewMode}
+          onToggleView={onToggleView}
           onOpenSubscription={() =>
             alert('Subscription & Billing Modal Open')
           }
