@@ -294,6 +294,30 @@ export default function Home() {
           </div>
         </header>
 
+        {/* Mobile Category Filter Strip */}
+        <div className="lg:hidden w-full border-b border-(--border) bg-(--bg-main)">
+          <div className="flex gap-2 overflow-x-auto px-4 py-2.5 scrollbar-none">
+            {[
+              'All Snippets', 'Installation', 'CLI',
+              'HTML + CSS', 'Javascript', 'React', 'Vue', 'Astro', 'Vite', 'Next.js',
+              'React Native', 'Expo', 'Python', 'Go', 'Rust',
+              'Notes', 'Website link lists', 'Icon Libraries', 'Shortcut', 'Ai code', 'Glossary',
+            ].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  activeCategory === cat
+                    ? 'bg-(--accent) text-white'
+                    : 'bg-(--bg-active) text-(--text-muted) hover:text-(--text-primary)'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Main Content Area with 20px Edge Padding on Tablet/Mobile */}
         <div className="p-5 md:p-8 w-full">
           {/* Page Heading */}
@@ -322,10 +346,10 @@ export default function Home() {
                   <article
                     key={snippet.id}
                     onClick={() => setSelectedSnippet(snippet)}
-                    className={`group relative rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md ${
+                    className={`group relative rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-(--accent) hover:shadow-lg hover:shadow-(--accent)/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--bg-main) ${
                       viewMode === 'list' 
                         ? 'p-4 flex items-center justify-between gap-6' 
-                        : 'p-6 flex flex-col justify-between'
+                        : 'p-8 flex flex-col justify-between'
                     }`}
                   >
                     {viewMode === 'list' ? (
