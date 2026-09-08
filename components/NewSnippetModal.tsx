@@ -68,18 +68,25 @@ export default function NewSnippetModal({
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6 overflow-y-auto">
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-[2px]" 
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-[2px]"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[var(--bg-surface)] border border-[var(--border)] p-6 md:p-8 shadow-2xl flex flex-col my-auto">
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--border)]">
-          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="snippet-modal-title"
+        className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-(--bg-surface) border border-(--border) p-6 md:p-8 shadow-2xl flex flex-col my-auto"
+      >
+        <div className="flex items-center justify-between pb-4 border-b border-(--border)">
+          <h2 id="snippet-modal-title" className="text-lg font-semibold text-(--text-primary)">
             {initialSnippet ? 'Edit Snippet' : 'Create New Snippet'}
           </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--bg-active)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+            aria-label="Close modal"
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-(--bg-active) text-(--text-primary) hover:bg-(--bg-hover)"
           >
             <X className="w-4 h-4" />
           </button>
@@ -87,28 +94,30 @@ export default function NewSnippetModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
+            <label htmlFor="snippet-title" className="block text-xs font-semibold uppercase tracking-wider text-(--text-muted) mb-1.5">
               Title
             </label>
             <input
+              id="snippet-title"
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Glassmorphism Card Effect"
-              className="w-full h-10 px-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              className="w-full h-10 px-3 rounded-xl bg-(--bg-main) border border-(--border) text-sm text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent)"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
+              <label htmlFor="snippet-category" className="block text-xs font-semibold uppercase tracking-wider text-(--text-muted) mb-1.5">
                 Category
               </label>
               <select
+                id="snippet-category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className="w-full h-10 px-3 rounded-xl bg-(--bg-main) border border-(--border) text-sm text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent)"
               >
                 <option value="General">General</option>
                 <option value="Languages & Web">Languages & Web</option>
@@ -119,57 +128,61 @@ export default function NewSnippetModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
+              <label htmlFor="snippet-tags" className="block text-xs font-semibold uppercase tracking-wider text-(--text-muted) mb-1.5">
                 Tags (comma separated)
               </label>
               <input
+                id="snippet-tags"
                 type="text"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
                 placeholder="React, CSS, UI"
-                className="w-full h-10 px-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className="w-full h-10 px-3 rounded-xl bg-(--bg-main) border border-(--border) text-sm text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent)"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
+            <label htmlFor="snippet-description" className="block text-xs font-semibold uppercase tracking-wider text-(--text-muted) mb-1.5">
               Description
             </label>
             <input
+              id="snippet-description"
               type="text"
               required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief summary of what this snippet does..."
-              className="w-full h-10 px-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              className="w-full h-10 px-3 rounded-xl bg-(--bg-main) border border-(--border) text-sm text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent)"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
+            <label htmlFor="snippet-code" className="block text-xs font-semibold uppercase tracking-wider text-(--text-muted) mb-1.5">
               Code Block
             </label>
             <textarea
+              id="snippet-code"
               required
               rows={5}
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="Paste or write your source code here..."
-              className="w-full p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border)] font-mono text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              className="w-full p-3 rounded-xl bg-(--bg-main) border border-(--border) font-mono text-xs text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent)"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
+            <label htmlFor="snippet-details" className="block text-xs font-semibold uppercase tracking-wider text-(--text-muted) mb-1.5">
               Detailed Notes / Explanation
             </label>
             <textarea
+              id="snippet-details"
               rows={3}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
               placeholder="Explain how it works, props, or usage context..."
-              className="w-full p-3 rounded-xl bg-[var(--bg-main)] border border-[var(--border)] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              className="w-full p-3 rounded-xl bg-(--bg-main) border border-(--border) text-sm text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-(--accent)"
             />
           </div>
 

@@ -55,14 +55,21 @@ export default function CommandPalette({
 
   return (
     <div className="fixed inset-0 z-[150] flex items-start justify-center pt-20 px-4">
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" 
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-xl rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="command-palette-label"
+        className="relative z-10 w-full max-w-xl rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150"
+      >
         <div className="flex items-center px-4 border-b border-[var(--border)]">
-          <Search className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
+          <label htmlFor="command-palette-input" className="sr-only" id="command-palette-label">Search snippets or navigate</label>
+          <Search className="w-4 h-4 text-[var(--text-muted)] shrink-0" aria-hidden="true" />
           <input
+            id="command-palette-input"
             ref={inputRef}
             type="text"
             value={query}
@@ -70,8 +77,10 @@ export default function CommandPalette({
             placeholder="Type a command or search snippets..."
             className="w-full h-14 px-3 bg-transparent text-[var(--text-primary)] text-sm focus:outline-none"
           />
-          <button 
+          <button
+            type="button"
             onClick={onClose}
+            aria-label="Close command palette"
             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-active)]"
           >
             <X className="w-4 h-4" />
@@ -80,9 +89,9 @@ export default function CommandPalette({
 
         <div className="max-h-[60vh] overflow-y-auto p-2 space-y-1">
           {quickActions.length > 0 && (
-            <div className="px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+            <h3 className="px-3 py-1.5 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Quick Links
-            </div>
+            </h3>
           )}
           {quickActions.map((action) => {
             const IconComponent = action.icon;
@@ -103,9 +112,9 @@ export default function CommandPalette({
             );
           })}
 
-          <div className="px-3 py-1.5 mt-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+          <h3 className="px-3 py-1.5 mt-2 text-[11px] font-semibold text-(--text-muted) uppercase tracking-wider">
             Snippets ({matchingSnippets.length})
-          </div>
+          </h3>
           {matchingSnippets.length === 0 ? (
             <div className="text-center py-8 text-sm text-[var(--text-muted)]">
               No matching snippets found.

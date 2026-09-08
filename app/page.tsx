@@ -295,7 +295,7 @@ export default function Home() {
         </header>
 
         {/* Mobile Category Filter Strip */}
-        <div className="lg:hidden w-full border-b border-(--border) bg-(--bg-main)">
+        <nav aria-label="Category filters" className="lg:hidden w-full border-b border-(--border) bg-(--bg-main)">
           <div className="flex gap-2 overflow-x-auto px-4 py-2.5 scrollbar-none">
             {[
               'All Snippets', 'Installation', 'CLI',
@@ -316,7 +316,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-        </div>
+        </nav>
 
         {/* Main Content Area with 20px Edge Padding on Tablet/Mobile */}
         <div className="p-5 md:p-8 w-full">
