@@ -88,7 +88,7 @@ export default function MobileNavDrawer({
         {/* Brand Header */}
         <div className="flex items-center justify-between h-[73px] px-4 shrink-0 border-b border-[var(--border)]">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--accent)] text-white font-bold text-lg shrink-0">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--accent)] text-[var(--accent-contrast)] font-bold text-lg shrink-0">
               09
             </div>
             <div className="flex flex-col">

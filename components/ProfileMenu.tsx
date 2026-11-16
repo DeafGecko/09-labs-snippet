@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useStoredState } from '@/utils/useStoredState';
 import Image from 'next/image';
 import { 
   CreditCard, 
@@ -34,32 +35,29 @@ export default function ProfileMenu({
   onToggleView,
 }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useStoredState<string | null>('09labs-avatar', null);
   
   // Editable profile states
-  const [name, setName] = useState('Dwight Rogers');
-  const [title, setTitle] = useState('Front-End Engineer');
+  const [name, setName] = useStoredState('09labs-name', 'Dwight Rogers');
+  const [title, setTitle] = useStoredState('09labs-title', 'Front-End Engineer');
+  const [draftName, setDraftName] = useState(name);
+  const [draftTitle, setDraftTitle] = useState(title);
   const [isEditing, setIsEditing] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Load saved profile data from localStorage on mount
-  useEffect(() => {
-    const savedAvatar = localStorage.getItem('09labs-avatar');
-    const savedName = localStorage.getItem('09labs-name');
-    const savedTitle = localStorage.getItem('09labs-title');
+  // Editing works on drafts, so Cancel leaves the saved profile alone
+  const startEditing = () => {
+    setDraftName(name);
+    setDraftTitle(title);
+    setIsEditing(true);
+  };
 
-    if (savedAvatar) setAvatarUrl(savedAvatar);
-    if (savedName) setName(savedName);
-    if (savedTitle) setTitle(savedTitle);
-  }, []);
-
-  // Save profile changes to localStorage
   const handleSaveProfile = () => {
+    setName(draftName);
+    setTitle(draftTitle);
     setIsEditing(false);
-    localStorage.setItem('09labs-name', name);
-    localStorage.setItem('09labs-title', title);
   };
 
   // Close dropdown when clicking outside
@@ -79,9 +77,7 @@ export default function ProfileMenu({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setAvatarUrl(result);
-        localStorage.setItem('09labs-avatar', result);
+        setAvatarUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -111,7 +107,7 @@ export default function ProfileMenu({
       {/* Profile Trigger Button (Avatar Only) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-9 h-9 rounded-full overflow-hidden bg-[var(--accent)] text-white flex items-center justify-center font-bold text-sm shrink-0 border-2 border-transparent hover:border-[var(--accent)] transition-all shadow-xs focus:outline-none"
+        className="relative w-9 h-9 rounded-full overflow-hidden bg-[var(--accent)] text-[var(--accent-contrast)] flex items-center justify-center font-bold text-sm shrink-0 border-2 border-transparent hover:border-[var(--accent)] transition-all shadow-xs focus:outline-none"
         title="Open Profile Menu"
       >
         {avatarUrl ? (
@@ -127,7 +123,7 @@ export default function ProfileMenu({
 
           {/* User Info & Editable Name/Title Section */}
           <div className="px-4 py-3 border-b border-[var(--border)] flex items-start gap-3">
-            <div className="relative group w-12 h-12 rounded-full overflow-hidden bg-[var(--accent)] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-sm mt-1">
+            <div className="relative group w-12 h-12 rounded-full overflow-hidden bg-[var(--accent)] text-[var(--accent-contrast)] flex items-center justify-center font-bold text-base shrink-0 shadow-sm mt-1">
               {avatarUrl ? (
                 <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
               ) : (
@@ -148,22 +144,22 @@ export default function ProfileMenu({
                 <div className="space-y-2">
                   <input 
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={draftName}
+                    onChange={(e) => setDraftName(e.target.value)}
                     placeholder="Full Name"
                     className="w-full px-2 py-1 text-xs rounded bg-[var(--bg-main)] text-[var(--text-primary)] border border-[var(--border)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                   />
                   <input 
                     type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={draftTitle}
+                    onChange={(e) => setDraftTitle(e.target.value)}
                     placeholder="Professional Title"
                     className="w-full px-2 py-1 text-xs rounded bg-[var(--bg-main)] text-[var(--text-primary)] border border-[var(--border)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                   />
                   <div className="flex items-center gap-2 pt-1">
                     <button 
                       onClick={handleSaveProfile}
-                      className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium bg-[var(--accent)] text-white rounded hover:opacity-90 transition-opacity"
+                      className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium bg-[var(--accent)] text-[var(--accent-contrast)] rounded hover:opacity-90 transition-opacity"
                     >
                       <Check className="w-3 h-3" />
                       <span>Save</span>
@@ -181,7 +177,7 @@ export default function ProfileMenu({
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{name}</p>
                     <button 
-                      onClick={() => setIsEditing(true)}
+                      onClick={startEditing}
                       className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 transition-colors"
                       title="Edit Profile"
                     >
@@ -208,7 +204,7 @@ export default function ProfileMenu({
                 onClick={() => onToggleView('grid')}
                 className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium border transition-colors ${
                   viewMode === 'grid' 
-                    ? 'bg-[var(--accent)] text-white border-transparent' 
+                    ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border-transparent' 
                     : 'bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--accent)]'
                 }`}
               >
@@ -220,7 +216,7 @@ export default function ProfileMenu({
                 onClick={() => onToggleView('list')}
                 className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium border transition-colors ${
                   viewMode === 'list' 
-                    ? 'bg-[var(--accent)] text-white border-transparent' 
+                    ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border-transparent' 
                     : 'bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--accent)]'
                 }`}
               >
@@ -238,7 +234,7 @@ export default function ProfileMenu({
                 onClick={() => onThemeChange('light')}
                 className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium border transition-colors ${
                   currentTheme === 'light' 
-                    ? 'bg-[var(--accent)] text-white border-transparent' 
+                    ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border-transparent' 
                     : 'bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--accent)]'
                 }`}
               >
@@ -250,7 +246,7 @@ export default function ProfileMenu({
                 onClick={() => onThemeChange('coffee')}
                 className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium border transition-colors ${
                   currentTheme === 'coffee' 
-                    ? 'bg-[var(--accent)] text-white border-transparent' 
+                    ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border-transparent' 
                     : 'bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--accent)]'
                 }`}
               >
@@ -262,7 +258,7 @@ export default function ProfileMenu({
                 onClick={() => onThemeChange('dark')}
                 className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium border transition-colors ${
                   currentTheme === 'dark' 
-                    ? 'bg-[var(--accent)] text-white border-transparent' 
+                    ? 'bg-[var(--accent)] text-[var(--accent-contrast)] border-transparent' 
                     : 'bg-[var(--bg-main)] text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--accent)]'
                 }`}
               >

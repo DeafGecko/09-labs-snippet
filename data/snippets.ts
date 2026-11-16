@@ -313,6 +313,15 @@ export const allSnippets: Snippet[] = [
     tags: ['Shortcuts', 'Productivity', 'Workflow'],
   },
   {
+    id: 'shortcut-github',
+    category: 'Shortcut',
+    title: 'GitHub Keyboard Shortcuts',
+    description: 'Fast keys for moving around github.com without the mouse.',
+    code: `/ : Focus search\nCmd/Ctrl + K : Command palette\nt : Go to file (inside a repo)\ng c : Go to code\ng i : Go to issues\ng p : Go to pull requests\ng n : Go to notifications\n? : Show all shortcuts`,
+    details: 'Press ? on any GitHub page to see the full list. Shortcuts are ignored while typing in a text field.',
+    tags: ['Shortcuts', 'GitHub', 'Productivity'],
+  },
+  {
     id: 'tool-5',
     category: 'Ai code',
     title: 'Prompt Engineering Template',

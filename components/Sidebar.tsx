@@ -261,7 +261,7 @@ export default function Sidebar({
                 h-10
                 rounded-xl
                 bg-[var(--accent)]
-                text-white
+                text-[var(--accent-contrast)]
                 font-bold
                 text-lg
                 shrink-0
@@ -449,8 +449,7 @@ export default function Sidebar({
                           activeCategory ===
                           item.name;
 
-                        const IconComponent =
-                          item.icon as any;
+                        const IconComponent = item.icon;
 
                         return (
                           <button
@@ -661,7 +660,7 @@ export default function Sidebar({
                 h-8
                 rounded-lg
                 bg-[var(--accent)]
-                text-white
+                text-[var(--accent-contrast)]
                 font-bold
                 text-sm
               "

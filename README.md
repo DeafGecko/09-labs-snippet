@@ -51,6 +51,21 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000/) in your browser to explore the vault.
 
+## Testing & Quality
+
+Case studies, open issues, and the unit test record are in [docs/](docs/).
+
+| Check | Command | Tool | Coverage |
+|---|---|---|---|
+| Unit & component tests | `npm test` | Vitest, jsdom, Testing Library | 20 tests across 7 files: storage wrapper, seed data integrity, modal, command palette, sandbox, profile menu, and page-level search and saved snippets |
+| Browser tests | `npm run test:e2e` | Playwright (system Chrome) | 2 sandbox tests: user code runs in the real browser and shows its output, and a thrown error is reported |
+| Accessibility | `npm run test:e2e` | axe-core via `@axe-core/playwright` | 3 tests, one each for light, coffee, and dark: no WCAG 2.0 and 2.1 A/AA violations on the home page |
+| Lint | `npm run lint` | ESLint (flat config, `eslint-config-next`) | Zero problems |
+| Types | `npm run typecheck` | TypeScript | Passes |
+| Performance & SEO | Lighthouse on `npm run build && npm start` | Lighthouse | Performance, accessibility, best practices, and SEO all score 100 on the production build, in light, coffee, and dark themes |
+
+Run everything at once with `npm run test:all`. The Playwright tests start the dev server on port 3000 if it isn't already running, and they use the Chrome installed on your machine.
+
 ## Status
 
 **Pre-Launch / Portfolio Polish** (Active Phase)

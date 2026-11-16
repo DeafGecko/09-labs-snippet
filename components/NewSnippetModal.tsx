@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Plus } from 'lucide-react';
 import { Snippet } from '@/data/snippets';
 
@@ -11,38 +11,27 @@ interface NewSnippetModalProps {
   initialSnippet?: Snippet | null;
 }
 
-export default function NewSnippetModal({
-  isOpen,
-  onClose,
-  onAddSnippet,
-  initialSnippet,
-}: NewSnippetModalProps) {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('General');
-  const [description, setDescription] = useState('');
-  const [code, setCode] = useState('');
-  const [details, setDetails] = useState('');
-  const [tagsInput, setTagsInput] = useState('');
-
-  useEffect(() => {
-    if (initialSnippet) {
-      setTitle(initialSnippet.title);
-      setCategory(initialSnippet.category);
-      setDescription(initialSnippet.description);
-      setCode(initialSnippet.code);
-      setDetails(initialSnippet.details);
-      setTagsInput(initialSnippet.tags.join(', '));
-    } else {
-      setTitle('');
-      setCategory('General');
-      setDescription('');
-      setCode('');
-      setDetails('');
-      setTagsInput('');
-    }
-  }, [initialSnippet, isOpen]);
-
+export default function NewSnippetModal({ isOpen, ...props }: NewSnippetModalProps) {
+  // Mounting the form only while open means it starts from the right values
+  // each time, with no effect needed to copy them in.
   if (!isOpen) return null;
+  return (
+    <NewSnippetForm
+      key={props.initialSnippet?.id ?? 'new'}
+      {...props}
+    />
+  );
+}
+
+type NewSnippetFormProps = Omit<NewSnippetModalProps, 'isOpen'>;
+
+function NewSnippetForm({ onClose, onAddSnippet, initialSnippet }: NewSnippetFormProps) {
+  const [title, setTitle] = useState(initialSnippet?.title ?? '');
+  const [category, setCategory] = useState(initialSnippet?.category ?? 'General');
+  const [description, setDescription] = useState(initialSnippet?.description ?? '');
+  const [code, setCode] = useState(initialSnippet?.code ?? '');
+  const [details, setDetails] = useState(initialSnippet?.details ?? '');
+  const [tagsInput, setTagsInput] = useState(initialSnippet?.tags.join(', ') ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,7 +185,7 @@ export default function NewSnippetModal({
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[var(--accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[var(--accent)] text-[var(--accent-contrast)] text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
             >
               <Plus className="w-4 h-4" />
               <span>{initialSnippet ? 'Save Changes' : 'Create Snippet'}</span>

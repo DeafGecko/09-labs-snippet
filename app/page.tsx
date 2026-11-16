@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { X, Copy, Check, Heart, Menu, MoreVertical, Terminal, Plus, Pencil, Trash2 } from 'lucide-react';
 
 import Sidebar from '@/components/Sidebar';
@@ -10,13 +10,16 @@ import SandboxDrawer from '@/components/SandboxDrawer';
 import CommandPalette from '@/components/CommandPalette';
 import ProfileMenu from '@/components/ProfileMenu';
 import { allSnippets as initialSnippets, Snippet } from '@/data/snippets';
-import { storage } from '@/utils/storage';
+import { useStoredState } from '@/utils/useStoredState';
+
+const NO_FAVORITES: string[] = [];
+const NO_CUSTOM_SNIPPETS: Snippet[] = [];
 
 type Theme = 'light' | 'coffee' | 'dark';
 
 export default function Home() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useStoredState<Theme>('09labs-theme', 'dark');
   const [activeCategory, setActiveCategory] = useState('All Snippets');
   const [selectedSnippet, setSelectedSnippet] = useState<Snippet | null>(null);
   const [snippetToEdit, setSnippetToEdit] = useState<Snippet | null>(null);
@@ -29,29 +32,34 @@ export default function Home() {
   const [isCmdOpen, setIsCmdOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Dynamic Snippets State
-  const [snippets, setSnippets] = useState<Snippet[]>(initialSnippets);
+  // Saved in localStorage: the user's own snippets, favorites, and theme.
+  const [customSnippets, setCustomSnippets] = useStoredState<Snippet[]>('09labs-custom-snippets', NO_CUSTOM_SNIPPETS);
+  const [favorites, setFavorites] = useStoredState<string[]>('09labs-favorites', NO_FAVORITES);
 
-  // Quick copy & favorites states
+  // Seed snippets edited or deleted this session. They reset on reload, as before.
+  const [seedOverrides, setSeedOverrides] = useState<Record<string, Snippet>>({});
+  const [removedSeedIds, setRemovedSeedIds] = useState<string[]>([]);
+
+  const snippets = useMemo(
+    () => [
+      ...initialSnippets
+        .filter(s => !removedSeedIds.includes(s.id))
+        .map(s => seedOverrides[s.id] ?? s),
+      ...customSnippets,
+    ],
+    [customSnippets, removedSeedIds, seedOverrides]
+  );
+
+  // Quick copy states
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [modalCopied, setModalCopied] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>([]);
+
+  // Apply the theme to <html>; the theme itself is read from storage above
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
-    const savedTheme = storage.get('09labs-theme', 'dark') as Theme;
-    setTheme(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
-    const savedFavs = storage.get('09labs-favorites', []);
-    if (Array.isArray(savedFavs)) {
-      setFavorites(savedFavs);
-    }
-
-    const savedCustomSnippets = storage.get('09labs-custom-snippets', []);
-    if (Array.isArray(savedCustomSnippets) && savedCustomSnippets.length > 0) {
-      setSnippets([...initialSnippets, ...savedCustomSnippets]);
-    }
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -64,32 +72,26 @@ export default function Home() {
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
-    storage.set('09labs-theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   const handleSaveSnippet = (snippet: Snippet) => {
-    let updatedList: Snippet[];
-    const exists = snippets.some(s => s.id === snippet.id);
-    if (exists) {
-      updatedList = snippets.map(s => s.id === snippet.id ? snippet : s);
+    if (customSnippets.some(s => s.id === snippet.id)) {
+      setCustomSnippets(customSnippets.map(s => s.id === snippet.id ? snippet : s));
+    } else if (snippet.id.startsWith('custom-')) {
+      setCustomSnippets([snippet, ...customSnippets]);
     } else {
-      updatedList = [snippet, ...snippets];
+      setSeedOverrides(prev => ({ ...prev, [snippet.id]: snippet }));
     }
-    setSnippets(updatedList);
-    
-    const customOnly = updatedList.filter(s => s.id.startsWith('custom-'));
-    storage.set('09labs-custom-snippets', customOnly);
     setSnippetToEdit(null);
   };
 
   const handleDeleteSnippet = (id: string) => {
     if (confirm('Are you sure you want to delete this snippet?')) {
-      const updatedList = snippets.filter(s => s.id !== id);
-      setSnippets(updatedList);
-      
-      const customOnly = updatedList.filter(s => s.id.startsWith('custom-'));
-      storage.set('09labs-custom-snippets', customOnly);
+      if (customSnippets.some(s => s.id === id)) {
+        setCustomSnippets(customSnippets.filter(s => s.id !== id));
+      } else {
+        setRemovedSeedIds(prev => [...prev, id]);
+      }
       setSelectedSnippet(null);
     }
   };
@@ -103,7 +105,6 @@ export default function Home() {
       updated = [...favorites, id];
     }
     setFavorites(updated);
-    storage.set('09labs-favorites', updated);
   };
 
   const handleCopyCode = (e: React.MouseEvent, id: string, code: string) => {
@@ -189,7 +190,7 @@ export default function Home() {
                     setIsNewSnippetOpen(true);
                     setIsHeaderActionsDrawerOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--accent)] text-white text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--accent)] text-[var(--accent-contrast)] text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
                 >
                   <Plus className="w-4 h-4" />
                   <span>New Snippet</span>
@@ -267,7 +268,7 @@ export default function Home() {
                   setSnippetToEdit(null);
                   setIsNewSnippetOpen(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent)] text-white text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent)] text-[var(--accent-contrast)] text-sm font-medium shadow-sm hover:opacity-90 transition-opacity"
               >
                 <Plus className="w-4 h-4" />
                 <span>Snippet</span>
@@ -308,7 +309,7 @@ export default function Home() {
                 onClick={() => setActiveCategory(cat)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   activeCategory === cat
-                    ? 'bg-(--accent) text-white'
+                    ? 'bg-(--accent) text-(--accent-contrast)'
                     : 'bg-(--bg-active) text-(--text-muted) hover:text-(--text-primary)'
                 }`}
               >
@@ -360,9 +361,9 @@ export default function Home() {
                             <span className="text-[11px] font-semibold text-[var(--accent)] uppercase tracking-wider shrink-0">
                               {snippet.category}
                             </span>
-                            <h3 className="text-sm font-semibold text-[var(--text-primary)] truncate">
+                            <h2 className="text-sm font-semibold text-[var(--text-primary)] truncate">
                               {snippet.title}
-                            </h3>
+                            </h2>
                           </div>
                           <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">
                             {snippet.description}
@@ -423,9 +424,9 @@ export default function Home() {
                             {snippet.category}
                           </span>
 
-                          <h3 className="text-lg font-semibold mt-3 pr-12 text-[var(--text-primary)]">
+                          <h2 className="text-lg font-semibold mt-3 pr-12 text-[var(--text-primary)]">
                             {snippet.title}
-                          </h3>
+                          </h2>
 
                           <p className="text-sm leading-6 text-[var(--text-muted)] mt-2">
                             {snippet.description}

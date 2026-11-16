@@ -11,23 +11,26 @@ interface CommandPaletteProps {
   onSelectCategory: (category: string) => void;
 }
 
-export default function CommandPalette({
-  isOpen,
+export default function CommandPalette({ isOpen, ...props }: CommandPaletteProps) {
+  // Mounting the dialog only while open gives it a fresh query each time.
+  if (!isOpen) return null;
+  return <CommandPaletteDialog {...props} />;
+}
+
+type CommandPaletteDialogProps = Omit<CommandPaletteProps, 'isOpen'>;
+
+function CommandPaletteDialog({
   onClose,
   onSelectSnippet,
   onSelectCategory,
-}: CommandPaletteProps) {
+}: CommandPaletteDialogProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setQuery('');
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+    const timer = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const quickActions = [
     {

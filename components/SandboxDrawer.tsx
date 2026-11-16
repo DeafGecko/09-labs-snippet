@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Terminal, Play, RefreshCw } from 'lucide-react';
 
 interface SandboxDrawerProps {
@@ -8,30 +8,62 @@ interface SandboxDrawerProps {
   onClose: () => void;
 }
 
+const SANDBOX_MESSAGE = '09labs-sandbox';
+
+// The code runs in an iframe with no same-origin access, so it cannot read
+// the page's DOM, cookies, or localStorage. It reports its logs back by message.
+function buildSandboxDocument(code: string) {
+  const script = `
+    const logs = [];
+    const format = (args) => args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+    console.log = (...args) => logs.push(format(args));
+    try {
+      (0, eval)(${JSON.stringify(code).replace(/</g, '\\u003c')});
+    } catch (err) {
+      logs.push('Error: ' + (err instanceof Error ? err.message : String(err)));
+    }
+    parent.postMessage({ type: '${SANDBOX_MESSAGE}', logs }, '*');
+  `;
+  return `<!doctype html><html><body><script>${script}</script></body></html>`;
+}
+
 export default function SandboxDrawer({ isOpen, onClose }: SandboxDrawerProps) {
   const [inputCode, setInputCode] = useState('// Type JavaScript or CSS test code here\nconsole.log("09 Labs Sandbox Active");');
   const [outputLog, setOutputLog] = useState<string[]>(['Ready for execution...']);
+  const [run, setRun] = useState<{ id: number; code: string } | null>(null);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.source !== frameRef.current?.contentWindow) return;
+      const data = event.data as { type?: string; logs?: unknown } | null;
+      if (data?.type !== SANDBOX_MESSAGE || !Array.isArray(data.logs)) return;
+      const logs = data.logs as string[];
+      setOutputLog(logs.length > 0 ? logs : ['Execution completed with no console output.']);
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   if (!isOpen) return null;
 
+  // A new iframe per run, so re-running the same code runs it again
   const handleRunCode = () => {
-    try {
-      const logs: string[] = [];
-      const originalLog = console.log;
-      console.log = (...args) => logs.push(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' '));
-      
-      // eslint-disable-next-line no-eval
-      eval(inputCode);
-      
-      console.log = originalLog;
-      setOutputLog(logs.length > 0 ? logs : ['Execution completed with no console output.']);
-    } catch (err: any) {
-      setOutputLog([`Error: ${err.message}`]);
-    }
+    setRun({ id: (run?.id ?? 0) + 1, code: inputCode });
   };
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6 overflow-hidden">
+      {run && (
+        <iframe
+          key={run.id}
+          ref={frameRef}
+          title="Sandbox runner"
+          sandbox="allow-scripts"
+          srcDoc={buildSandboxDocument(run.code)}
+          className="hidden"
+        />
+      )}
       <button 
         type="button" 
         onClick={onClose} 
@@ -47,7 +79,7 @@ export default function SandboxDrawer({ isOpen, onClose }: SandboxDrawerProps) {
       >
         <div className="flex items-center justify-between pb-4 border-b border-(--border) shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-(--accent) text-white flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-(--accent) text-(--accent-contrast) flex items-center justify-center">
               <Terminal className="w-4 h-4" aria-hidden="true" />
             </div>
             <h2 id="sandbox-modal-title" className="text-xl font-semibold text-(--text-primary)">Component Sandbox</h2>
@@ -69,7 +101,7 @@ export default function SandboxDrawer({ isOpen, onClose }: SandboxDrawerProps) {
               <button
                 type="button"
                 onClick={handleRunCode}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-(--accent) text-white hover:opacity-90 transition-opacity"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-(--accent) text-(--accent-contrast) hover:opacity-90 transition-opacity"
               >
                 <Play className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
                 <span>Run Code</span>

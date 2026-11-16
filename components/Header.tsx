@@ -142,7 +142,7 @@ export default function Header({
             font-medium
             rounded-xl
             bg-[var(--accent)]
-            text-white
+            text-[var(--accent-contrast)]
             hover:opacity-90
             transition-opacity
           "
