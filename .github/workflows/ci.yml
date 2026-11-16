@@ -18,14 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Debug install inputs
-        run: |
-          git log -1 --oneline
-          npm -v
-          sha256sum package.json package-lock.json
-          grep -c vite package.json || true
-          grep -n '"node_modules/vite"' package-lock.json || echo "no node_modules/vite entry in lock"
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
