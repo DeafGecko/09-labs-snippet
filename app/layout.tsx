@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "A personal vault of code snippets, shortcuts, and component patterns.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
